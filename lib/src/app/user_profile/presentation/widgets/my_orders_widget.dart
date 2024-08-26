@@ -60,7 +60,8 @@ class OrderCard extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const Placeholder(), // Replace with actual screen
+                builder: (context) =>
+                    const Placeholder(), // Replace with actual screen
               ),
             );
           },
@@ -92,7 +93,8 @@ class OrderCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             item.itemData.itemName,
-                            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -119,7 +121,8 @@ class OrderCard extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text(
                       '${order.finalPrice.toStringAsFixed(2)} ${order.currency}',
-                      style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                   ],

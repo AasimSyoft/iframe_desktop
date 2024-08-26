@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:iframe_desktop/src/app/user_profile/presentation/widgets/texfield_widget.dart';
+import 'package:iframe_desktop/src/app/user_profile/providers/edit_profile_provider.dart';
+import 'package:iframe_desktop/src/features/login/providers/otp_provider.dart';
 
-import 'texfield_widget.dart';
+class EditProfileView extends ConsumerWidget {
+  final TextEditingController fnameController = TextEditingController();
+  final TextEditingController lnameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
-class EditProfileView extends StatelessWidget {
-  const EditProfileView({super.key});
+  EditProfileView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Retrieve userId from verifyOtpProvider
+    final userId = ref.watch(verifyOtpProvider.select((state) => state.userId));
+
+    // Listen to the userProfileNotifierProvider changes inside build method
+    ref.listen<UserProfileState>(userProfileNotifierProvider, (prev, next) {
+      if (!next.isLoading) {
+        final message = next.message ?? 'Profile updated successfully';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -17,7 +37,6 @@ class EditProfileView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User info section
               const Text(
                 "Edit Profile",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
@@ -25,13 +44,11 @@ class EditProfileView extends StatelessWidget {
               const SizedBox(height: 30),
               const Row(
                 children: [
-                  // Profile Image
                   CircleAvatar(
                     radius: 40,
                     backgroundImage: AssetImage('assets/images/ecom.jpeg'),
                   ),
                   SizedBox(width: 16),
-                  // User Details
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -48,20 +65,18 @@ class EditProfileView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-
-              // Form Fields
               Row(
                 children: [
                   Expanded(
                     child: TextFieldWidget(
+                      textEditingController: fnameController,
                       hintText: 'Enter your First Name',
                       label: 'First Name',
                       prefixIcon: HugeIcons.strokeRoundedUser,
                       validator: (value) {
-                        RegExp regExp = RegExp(r'^[a-zA-Z ]+$');
                         if (value!.isEmpty) {
                           return 'Please enter First Name';
-                        } else if (!regExp.hasMatch(value)) {
+                        } else if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(value)) {
                           return 'Please enter valid Name';
                         }
                         return null;
@@ -71,14 +86,14 @@ class EditProfileView extends StatelessWidget {
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextFieldWidget(
+                      textEditingController: lnameController,
                       hintText: 'Enter Last Name',
                       label: 'Last Name',
                       prefixIcon: HugeIcons.strokeRoundedUser,
                       validator: (value) {
-                        RegExp regExp = RegExp(r'^[a-zA-Z ]+$');
                         if (value!.isEmpty) {
-                          return 'Please enter First Name';
-                        } else if (!regExp.hasMatch(value)) {
+                          return 'Please enter Last Name';
+                        } else if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(value)) {
                           return 'Please enter valid Name';
                         }
                         return null;
@@ -88,20 +103,19 @@ class EditProfileView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-
               Row(
                 children: [
                   Expanded(
                     child: TextFieldWidget(
+                      textEditingController: phoneController,
                       hintText: 'Enter Phone Number',
                       label: 'Phone Number',
                       prefixIcon: HugeIcons.strokeRoundedSendToMobile,
                       validator: (value) {
-                        RegExp regExp = RegExp(r'^[a-zA-Z ]+$');
                         if (value!.isEmpty) {
-                          return 'Please enter First Name';
-                        } else if (!regExp.hasMatch(value)) {
-                          return 'Please enter valid Name';
+                          return 'Please enter Phone Number';
+                        } else if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                          return 'Please enter valid Phone Number';
                         }
                         return null;
                       },
@@ -110,15 +124,17 @@ class EditProfileView extends StatelessWidget {
                   const SizedBox(width: 16),
                   Expanded(
                     child: TextFieldWidget(
+                      textEditingController: emailController,
                       hintText: 'Enter Your Email',
-                      label: 'Enter Email',
+                      label: 'Email',
                       prefixIcon: HugeIcons.strokeRoundedMail01,
                       validator: (value) {
-                        RegExp regExp = RegExp(r'^[a-zA-Z ]+$');
                         if (value!.isEmpty) {
-                          return 'Please enter First Name';
-                        } else if (!regExp.hasMatch(value)) {
-                          return 'Please enter valid Name';
+                          return 'Please enter Email';
+                        } else if (!RegExp(
+                                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                            .hasMatch(value)) {
+                          return 'Please enter valid Email';
                         }
                         return null;
                       },
@@ -126,13 +142,13 @@ class EditProfileView extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
-
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _updateProfile(context, ref, userId ?? '');
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 40, vertical: 15),
@@ -152,5 +168,28 @@ class EditProfileView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _updateProfile(BuildContext context, WidgetRef ref, String userId) {
+    if (userId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('User ID is missing. Unable to update profile.')),
+      );
+      return;
+    }
+
+    final String firstName = fnameController.text;
+    final String lastName = lnameController.text;
+    final String phone = phoneController.text;
+
+    ref.read(userProfileNotifierProvider.notifier).postUserProfileInfo(
+          ccode: "+91",
+          fname: firstName,
+          lname: lastName,
+          phoneNumber: phone,
+          isNewUser: false,
+          id: userId, // Ensure that userId is passed here
+        );
   }
 }

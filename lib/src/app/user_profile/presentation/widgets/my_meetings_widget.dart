@@ -1,59 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iframe_desktop/src/app/user_profile/data/models/meetings.dart';
+import 'package:iframe_desktop/src/app/user_profile/providers/my_enquiry_provider.dart';
 import 'package:intl/intl.dart';
 
-class MyMeetingView extends StatelessWidget {
+// Define a provider for fetching meetings
+final meetingsProvider = FutureProvider<MeetingsModel>((ref) async {
+  final userRepository = ref.watch(userRepositoryProvider);
+  return userRepository.fetchMeetings();
+});
+
+class MyMeetingView extends ConsumerWidget {
   const MyMeetingView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Hardcoded list of meetings
-    final List<Map<String, dynamic>> myMeetingList = [
-      {
-        'staffName': 'John Doe',
-        'bookingName': 'Project Meeting',
-        'date': DateTime.now(),
-      },
-      {
-        'staffName': 'Jane Smith',
-        'bookingName': 'Client Discussion',
-        'date': DateTime.now().add(const Duration(days: 1)),
-      },
-      {
-        'staffName': 'Alice Johnson',
-        'bookingName': 'Team Standup',
-        'date': DateTime.now().add(const Duration(days: 2)),
-      },
-      {
-        'staffName': 'Bob Brown',
-        'bookingName': 'Performance Review',
-        'date': DateTime.now().add(const Duration(days: 3)),
-      },
-      {
-        'staffName': 'Bob Brown',
-        'bookingName': 'Performance Review',
-        'date': DateTime.now().add(const Duration(days: 3)),
-      },
-      {
-        'staffName': 'Bob Brown',
-        'bookingName': 'Performance Review',
-        'date': DateTime.now().add(const Duration(days: 3)),
-      },
-      {
-        'staffName': 'Bob Brown',
-        'bookingName': 'Performance Review',
-        'date': DateTime.now().add(const Duration(days: 3)),
-      },
-      {
-        'staffName': 'Bob Brown',
-        'bookingName': 'Performance Review',
-        'date': DateTime.now().add(const Duration(days: 3)),
-      },
-      {
-        'staffName': 'Bob Brown',
-        'bookingName': 'Performance Review',
-        'date': DateTime.now().add(const Duration(days: 3)),
-      },
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final meetingsAsyncValue = ref.watch(meetingsProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -66,22 +28,33 @@ class MyMeetingView extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
       ),
-      body: ListView.separated(
-        itemCount: myMeetingList.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return Divider(
-            color: Colors.grey.shade300,
-            height: 0,
+      body: meetingsAsyncValue.when(
+        data: (meetings) {
+          // Check if data is available
+          if (meetings.data == null || meetings.data!.isEmpty) {
+            return const Center(child: Text('No meetings available'));
+          }
+
+          return ListView.separated(
+            itemCount: meetings.data!.length,
+            separatorBuilder: (BuildContext context, int index) {
+              return Divider(
+                color: Colors.grey.shade300,
+                height: 0,
+              );
+            },
+            itemBuilder: (BuildContext context, int index) {
+              final meeting = meetings.data![index];
+              return MyMeetingCard(
+                staffName: meeting.staffName,
+                bookingName: meeting.bookingName,
+                date: meeting.date,
+              );
+            },
           );
         },
-        itemBuilder: (BuildContext context, int index) {
-          final meeting = myMeetingList[index];
-          return MyMeetingCard(
-            staffName: meeting['staffName'],
-            bookingName: meeting['bookingName'],
-            date: meeting['date'],
-          );
-        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => Center(child: Text('Error: $error')),
       ),
     );
   }

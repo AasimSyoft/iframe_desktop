@@ -1,52 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iframe_desktop/src/app/user_profile/providers/my_enquiry_provider.dart';
 
-class MyEnquiryWidget extends StatelessWidget {
+class MyEnquiryWidget extends ConsumerWidget {
   const MyEnquiryWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> enquiryList = [
-      {
-        'requirementTitle': 'Web Development',
-        'description': 'Looking for a web development project.',
-        'referredBy': 'John Doe',
-      },
-      {
-        'requirementTitle': 'Mobile App Development',
-        'description': 'Need a mobile app for our business.',
-        'referredBy': 'Jane Smith',
-      },
-      {
-        'requirementTitle': 'SEO Optimization',
-        'description': 'Looking to optimize our website for search engines.',
-        'referredBy': 'Alice Johnson',
-      },
-      {
-        'requirementTitle': 'SEO Optimization',
-        'description': 'Looking to optimize our website for search engines.',
-        'referredBy': 'Alice Johnson',
-      },
-      {
-        'requirementTitle': 'Mobile App Development',
-        'description': 'Need a mobile app for our business.',
-        'referredBy': 'Jane Smith',
-      },
-      {
-        'requirementTitle': 'SEO Optimization',
-        'description': 'Looking to optimize our website for search engines.',
-        'referredBy': 'Alice Johnson',
-      },
-      {
-        'requirementTitle': 'SEO Optimization',
-        'description': 'Looking to optimize our website for search engines.',
-        'referredBy': 'Alice Johnson',
-      },
-      {
-        'requirementTitle': 'Web Development',
-        'description': 'Looking for a web development project.',
-        'referredBy': 'John Doe',
-      },
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enquiriesAsyncValue = ref.watch(enquiriesProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -59,18 +20,24 @@ class MyEnquiryWidget extends StatelessWidget {
           style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
         ),
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        itemCount: enquiryList.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 10),
-        itemBuilder: (context, index) {
-          final enquiry = enquiryList[index];
-          return EnquiryCard(
-            requirementTitle: enquiry['requirementTitle'] ?? 'N/A',
-            description: enquiry['description'] ?? 'N/A',
-            referredBy: enquiry['referredBy'] ?? 'N/A',
+      body: enquiriesAsyncValue.when(
+        data: (enquiryList) {
+          return ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            itemCount: enquiryList.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final enquiry = enquiryList[index];
+              return EnquiryCard(
+                requirementTitle: enquiry.requirementTitle ?? 'N/A',
+                description: enquiry.description ?? 'N/A',
+                referredBy: enquiry.owner ?? 'N/A',
+              );
+            },
           );
         },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(child: Text('Error: $error')),
       ),
     );
   }
@@ -90,8 +57,6 @@ class EnquiryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final theme = Theme.of(context);
-    // final colorScheme = theme.colorScheme;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
@@ -109,13 +74,12 @@ class EnquiryCard extends StatelessWidget {
       child: ListTile(
         title: Text(
           requirementTitle,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.brown),
+          style:
+              const TextStyle(fontWeight: FontWeight.bold, color: Colors.brown),
         ),
         subtitle: Text(description),
         trailing: Text(referredBy),
-        onTap: () {
-          // Handle onTap event, e.g., navigate to details page
-        },
+        onTap: () {},
       ),
     );
   }

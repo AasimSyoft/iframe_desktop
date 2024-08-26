@@ -6,4 +6,7 @@ class ApiUrl {
   static const String info = '/users/profile/info/';
   static const String logIn = '/users/customer/login/';
   static const String verifyOtp = '/users/customer/verify/';
+  static const String enquiry = '/crm_service/enduser/leadsdata/';
+  static const String meeting = '/calendars/iframe/bookings/';
+  static const String orders = '/product/orders/';
 }

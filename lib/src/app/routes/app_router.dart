@@ -76,7 +76,7 @@ class AppRouter {
                   AppRoute(
                     useFade: true,
                     _Path.editProfile,
-                    (_) => const EditProfileView(),
+                    (_) => EditProfileView(),
                   ),
                   AppRoute(
                     useFade: true,
