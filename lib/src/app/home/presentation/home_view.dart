@@ -6,7 +6,6 @@ import 'package:iframe_desktop/src/app/home/widgets/service_widget.dart';
 
 import '../widgets/announcement_widget.dart';
 import '../widgets/appoitment_catagory_widget.dart';
-import '../widgets/appoitment_widget.dart';
 import '../widgets/form_widget.dart';
 import '../widgets/gallery_widget.dart';
 import '../widgets/heading_widget.dart';
@@ -35,7 +34,7 @@ class HomeView extends StatelessWidget {
               SizedBox(height: 20),
               BannerWidget(),
               SizedBox(height: 20),
-              AppointmentWidget(),
+              // AppointmentWidget(),
               SizedBox(height: 20),
               AppointmentCategoryWidget(),
               SizedBox(height: 20),

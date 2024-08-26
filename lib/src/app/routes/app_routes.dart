@@ -18,6 +18,8 @@ class _Path {
   static const String myEnquiry = 'myEnquiry';
   static const String services = 'services';
   static const String meetings = 'meetings';
+  static const String meetingDetails = 'meetingDetails';
+
   static const String orders = 'orders';
   static const String manageAddress = 'manageAddress';
 }
@@ -40,6 +42,8 @@ class Routes {
   static String myEnquiry = '/myEnquiry';
   static String services = '/services';
   static String meetings = '/meetings';
+  static String meetingDetails = '/meetings/meetingDetails';
+
   static String orders = '/orders';
   static String manageAddress = '/manageAddress';
 }

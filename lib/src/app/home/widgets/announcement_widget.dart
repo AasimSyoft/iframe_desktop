@@ -7,7 +7,8 @@ class AnnouncementWidget extends StatefulWidget {
   State<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
 
-class _AnnouncementWidgetState extends State<AnnouncementWidget> with AutomaticKeepAliveClientMixin {
+class _AnnouncementWidgetState extends State<AnnouncementWidget>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -34,12 +35,16 @@ class _AnnouncementWidgetState extends State<AnnouncementWidget> with AutomaticK
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 3, // Hardcoded item count
-            separatorBuilder: (context, index) => Divider(thickness: 3.0, color: Colors.grey.shade200),
+            separatorBuilder: (context, index) =>
+                Divider(thickness: 3.0, color: Colors.grey.shade200),
             itemBuilder: (context, index) {
               return ListTile(
                   title: Text(
-                    "Announcement Title ${index + 1}", // Hardcoded title
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                    "Announcement Title ${index + 1}",
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

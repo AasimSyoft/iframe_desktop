@@ -9,4 +9,7 @@ class ApiUrl {
   static const String enquiry = '/crm_service/enduser/leadsdata/';
   static const String meeting = '/calendars/iframe/bookings/';
   static const String orders = '/product/orders/';
+  static const String updateProfile = '/crm_service/Contacts';
+  static const String appoitments = '/consultations/end_user/appointments/';
+  static const String getClientProjects = '/client/projects/';
 }

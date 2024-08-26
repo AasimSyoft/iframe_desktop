@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iframe_desktop/src/app/routes/app_router.dart';
 import 'package:iframe_desktop/src/app/user_profile/data/models/meetings.dart';
 import 'package:iframe_desktop/src/app/user_profile/providers/my_enquiry_provider.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +32,6 @@ class MyMeetingView extends ConsumerWidget {
       ),
       body: meetingsAsyncValue.when(
         data: (meetings) {
-          // Check if data is available
           if (meetings.data == null || meetings.data!.isEmpty) {
             return const Center(child: Text('No meetings available'));
           }
@@ -49,6 +50,7 @@ class MyMeetingView extends ConsumerWidget {
                 staffName: meeting.staffName,
                 bookingName: meeting.bookingName,
                 date: meeting.date,
+                meetingId: meeting.id, // Pass the meetingId
               );
             },
           );
@@ -64,12 +66,14 @@ class MyMeetingCard extends StatelessWidget {
   final String? staffName;
   final String? bookingName;
   final DateTime? date;
+  final String? meetingId; // Add the meetingId
 
   const MyMeetingCard({
     super.key,
     this.staffName,
     this.bookingName,
     this.date,
+    this.meetingId, // Initialize meetingId
   });
 
   @override
@@ -130,7 +134,8 @@ class MyMeetingCard extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
         visualDensity: VisualDensity.compact,
         onTap: () {
-          // Handle navigation or action on tap
+          context.goNamed(Routes.meetingDetails,
+              extra: meetingId); // Pass the meetingId
         },
       ),
     );

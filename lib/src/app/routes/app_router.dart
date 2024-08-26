@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iframe_desktop/src/app/user_profile/presentation/user_wrapper.dart';
+import 'package:iframe_desktop/src/app/user_profile/presentation/widgets/my_meetings_details_view.dart';
 import 'package:iframe_desktop/src/features/cart/presentation/cart_view.dart';
 import 'package:iframe_desktop/src/features/login/presentation/login_view.dart';
 import 'package:iframe_desktop/src/features/login/presentation/verify_otp_view.dart';
@@ -48,13 +49,18 @@ class AppRouter {
         routes: [
           AppRoute(
             _Path.cart,
+            useFade: true,
             (_) => const CartView(),
             routes: [
               AppRoute(
                 _Path.checkout,
+                useFade: true,
                 (_) => const CheckoutView(),
                 routes: [
-                  AppRoute(_Path.success, (_) => const OrderSuccessView())
+                  AppRoute(
+                      _Path.success,
+                      useFade: true,
+                      (_) => const OrderSuccessView())
                 ],
               ),
             ],
@@ -96,13 +102,18 @@ class AppRouter {
                   AppRoute(
                     useFade: true,
                     _Path.services,
-                    (_) => const MyServicesWidget(),
+                    (_) => const ClientProjectsView(),
                   ),
                   AppRoute(
-                    useFade: true,
-                    _Path.meetings,
-                    (_) => const MyMeetingView(),
-                  ),
+                      useFade: true,
+                      _Path.meetings,
+                      (_) => const MyMeetingView(),
+                      routes: [
+                        AppRoute(
+                            _Path.meetingDetails,
+                            useFade: true,
+                            (_) => const MyMeetingDetailsView())
+                      ]),
                   AppRoute(
                     useFade: true,
                     _Path.orders,
