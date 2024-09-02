@@ -9,26 +9,26 @@ class VerifyOtpState {
   final bool isLoading;
   final String? message;
   final bool isOtpVerified;
-  final String? userId; // Add userId field
+  final String? userId;
 
   VerifyOtpState({
     this.isLoading = false,
     this.message,
     this.isOtpVerified = false,
-    this.userId, // Initialize userId
+    this.userId,
   });
 
   VerifyOtpState copyWith({
     bool? isLoading,
     String? message,
     bool? isOtpVerified,
-    String? userId, // Add userId to copyWith
+    String? userId,
   }) {
     return VerifyOtpState(
       isLoading: isLoading ?? this.isLoading,
       message: message ?? this.message,
       isOtpVerified: isOtpVerified ?? this.isOtpVerified,
-      userId: userId ?? this.userId, // Update userId
+      userId: userId ?? this.userId,
     );
   }
 }
@@ -45,15 +45,14 @@ class VerifyOtpNotifier extends StateNotifier<VerifyOtpState> {
     final response = await loginRepository.verifyOtp(otp: otp, id: userId);
 
     if (response != null && response.statusCode == 200) {
-      // Extract userId from the nested data field
-      final responseData = response.data['data']; // Access the data field
-      final extractedUserId = responseData['id']; // Extract the ID from data
+      final responseData = response.data['data'];
+      final extractedUserId = responseData['id'];
 
       state = state.copyWith(
         isLoading: false,
         isOtpVerified: true,
         message: 'OTP verified successfully',
-        userId: extractedUserId, // Set the userId in state
+        userId: extractedUserId,
       );
       print("UserId isssssssssssssssssssss:$extractedUserId");
 

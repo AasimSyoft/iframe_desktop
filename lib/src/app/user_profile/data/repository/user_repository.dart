@@ -13,7 +13,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 class UserRepository {
   final Dio _dio = Dio();
   final String accessToken =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI0OTIzNTQxLCJpYXQiOjE3MjQ2NjQzNDEsImp0aSI6IjdjYjA5MzhmODZkNDRkMzQ5NTE1YzdmNjc0NjZmNzhlIiwiaWQiOiI3YWM5YjVmNS01NDMwLTRkMzAtYjMxNi01Zjg1NzJhMTc1Y2QiLCJ1dHlwZSI6IkVORFVTRVIiLCJvcmdhbmlzYXRpb24iOiI3YzQ1ZGZmNy04NGEwLTQ0OTUtYThiZS1iYjJiNDJkNDU1NDYiLCJkZXB0IjoiIiwicm9sZSI6IkVORFVTRVIiLCJwZXJtaXNzaW9ucyI6e30sImFkbWluX2lkIjoiN2M4MjVkOGYtYjRjMi00YjQ0LWE0M2YtZTE5MDFkZjdjZDY4In0.hgYG9fx0LA8rRtFV9PTDVGE0LKA0E7tJHZLKAZHnRyU";
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI1MTc5NzIwLCJpYXQiOjE3MjQ5MjA1MjAsImp0aSI6ImY1NTlhZGU2MjAxZjQyYWI5N2FkZjkwMTZjOTIyYjU3IiwiaWQiOiI3YWM5YjVmNS01NDMwLTRkMzAtYjMxNi01Zjg1NzJhMTc1Y2QiLCJ1dHlwZSI6IkVORFVTRVIiLCJvcmdhbmlzYXRpb24iOiI3YzQ1ZGZmNy04NGEwLTQ0OTUtYThiZS1iYjJiNDJkNDU1NDYiLCJkZXB0IjoiIiwicm9sZSI6IkVORFVTRVIiLCJwZXJtaXNzaW9ucyI6e30sImFkbWluX2lkIjoiN2M4MjVkOGYtYjRjMi00YjQ0LWE0M2YtZTE5MDFkZjdjZDY4In0.YfcIWTYewWAK24-M4GkxbuE2LstAp9C9Yf0mHp0KIGU";
 
   UserRepository() {
     _dio.interceptors.add(TalkerDioLogger(talker: Talker()));
@@ -77,6 +77,18 @@ class UserRepository {
       if (kDebugMode) {
         print('Error fetching user info: ${e.message}');
       }
+      rethrow;
+    }
+  }
+
+  Future<Response> preSignedUrl({Map<String, dynamic>? queryParameters}) async {
+    const String url = 'https://stage.backend.brexa.ai${ApiUrl.preSignedUrl}';
+
+    try {
+      final response = await _dio.get(url,
+          queryParameters: queryParameters, options: _getAuthHeader());
+      return response;
+    } catch (e) {
       rethrow;
     }
   }

@@ -39,7 +39,7 @@ class Sidebar extends StatelessWidget {
     SidebarItem(
         icon: HugeIcons.strokeRoundedCalendar03,
         title: "Appointments",
-        route: Routes.appoitments,
+        route: Routes.appointments,
         additionalIcon: HugeIcons.strokeRoundedArrowRight01),
     SidebarItem(
         icon: HugeIcons.strokeRoundedFile01,
@@ -133,7 +133,8 @@ class Sidebar extends StatelessWidget {
                             const SizedBox(width: 10),
                             Text(
                               item.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                             const Spacer(),
                             Icon(

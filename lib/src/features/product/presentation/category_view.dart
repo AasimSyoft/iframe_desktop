@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../category/providers/category_provider.dart';
+import 'package:iframe_desktop/src/features/product/providers/category_provider.dart';
 
 class CategoryListView extends ConsumerWidget {
   final List<String> categories;
   final Axis scrollDirection;
+  final void Function(String) onCategorySelected;
 
   const CategoryListView({
     super.key,
     required this.categories,
     this.scrollDirection = Axis.vertical,
-    required Null Function(dynamic category) onCategorySelected,
+    required this.onCategorySelected,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedIndex = ref.watch(categoryProvider);
+    final String selectedCategory = ref.watch(categoryProvider);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final bool isDesktop = screenWidth >= 1024;
+
+    // Include the default "All" category in the list
+    final categoriesWithAll = ['All'] + categories;
 
     return SizedBox(
       height: scrollDirection == Axis.horizontal ? 60.0 : null,
@@ -31,51 +34,69 @@ class CategoryListView extends ConsumerWidget {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Category List
                   Expanded(
-                    child: _buildCategoryList(selectedIndex, ref, isDesktop),
+                    child: _buildCategoryList(
+                      selectedCategory,
+                      ref,
+                      isDesktop,
+                      categoriesWithAll,
+                    ),
                   ),
                 ],
               )
-            : _buildCategoryList(selectedIndex, ref, isDesktop),
+            : _buildCategoryList(
+                selectedCategory,
+                ref,
+                isDesktop,
+                categoriesWithAll,
+              ),
       ),
     );
   }
 
-  Widget _buildCategoryList(int selectedIndex, WidgetRef ref, bool isDesktop) {
+  Widget _buildCategoryList(
+    String selectedCategory,
+    WidgetRef ref,
+    bool isDesktop,
+    List<String> categoriesWithAll,
+  ) {
     return ListView(
       scrollDirection: scrollDirection,
       padding: EdgeInsets.zero,
-      children: categories.asMap().entries.map((entry) {
-        final index = entry.key;
-        final category = entry.value;
-        final isSelected = selectedIndex == index;
+      children: categoriesWithAll.map((category) {
+        final isSelected = category == selectedCategory;
 
         return Padding(
           padding: scrollDirection == Axis.vertical
               ? const EdgeInsets.symmetric(horizontal: 10.0)
               : const EdgeInsets.symmetric(horizontal: 5.0),
           child: isDesktop
-              ? _buildDesktopCategoryItem(category, isSelected, ref, index)
-              : _buildMobileTabletCategoryItem(
-                  category, isSelected, ref, index),
+              ? _buildDesktopCategoryItem(
+                  category,
+                  isSelected,
+                  ref,
+                  categoriesWithAll.indexOf(category),
+                )
+              : _buildMobileTabletCategoryItem(category, isSelected, ref),
         );
       }).toList(),
     );
   }
 
-  // Styling for Desktop
   Widget _buildDesktopCategoryItem(
-      String category, bool isSelected, WidgetRef ref, int index) {
+    String category,
+    bool isSelected,
+    WidgetRef ref,
+    int index,
+  ) {
     return GestureDetector(
       onTap: () {
-        ref.read(categoryProvider.notifier).selectCategory(index);
+        onCategorySelected(category);
       },
       child: Container(
         margin: scrollDirection == Axis.vertical
             ? const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0)
-            : const EdgeInsets.symmetric(
-                horizontal: 10.0), // Adjust margin for horizontal scroll
+            : const EdgeInsets.symmetric(horizontal: 10.0),
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         decoration: BoxDecoration(
           gradient: isSelected
@@ -85,14 +106,14 @@ class CategoryListView extends ConsumerWidget {
                   end: Alignment.bottomRight,
                 )
               : null,
-          color: isSelected ? null : Colors.transparent,
+          color: isSelected ? Colors.brown.shade500 : Colors.transparent,
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: Center(
           child: Text(
             category,
             style: TextStyle(
-              color: Colors.black,
+              color: isSelected ? Colors.black : Colors.black,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -101,26 +122,25 @@ class CategoryListView extends ConsumerWidget {
     );
   }
 
-  // Styling for Mobile/Tablet
   Widget _buildMobileTabletCategoryItem(
-      String category, bool isSelected, WidgetRef ref, int index) {
+    String category,
+    bool isSelected,
+    WidgetRef ref,
+  ) {
     return ChoiceChip(
       label: Text(category),
       selected: isSelected,
       onSelected: (selected) {
-        ref.read(categoryProvider.notifier).selectCategory(index);
+        onCategorySelected(category);
       },
       selectedColor: Colors.brown.shade500,
       backgroundColor: Colors.white,
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.black,
+        color: isSelected ? Colors.black : Colors.black,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
-      side: BorderSide(
-        color: isSelected ? Colors.transparent : Colors.grey,
-      ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(8.0),
       ),
     );
   }

@@ -1,9 +1,13 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iframe_desktop/src/app/routes/app_router.dart';
 import 'package:iframe_desktop/src/app/user_profile/data/models/appointments.dart';
 import 'package:iframe_desktop/src/app/user_profile/providers/my_appoitments_provider.dart';
+import 'package:iframe_desktop/src/features/product/widgets/product_card_widget.dart';
+import 'package:responsive_grid_list/responsive_grid_list.dart';
 
 class AppointmentWidget extends ConsumerStatefulWidget {
   const AppointmentWidget({super.key});
@@ -48,7 +52,7 @@ class _AppointmentWidgetState extends ConsumerState<AppointmentWidget> {
                   children: [
                     appointmentsState.when(
                       data: (myAppointment) {
-                        final appointments = myAppointment.appointment ?? [];
+                        final appointments = myAppointment.data ?? [];
                         return Padding(
                           padding: const EdgeInsets.all(16.0),
                           child:
@@ -60,8 +64,8 @@ class _AppointmentWidgetState extends ConsumerState<AppointmentWidget> {
                       error: (error, stack) =>
                           Center(child: Text('Error: $error')),
                     ),
-                    const Center(child: Text('Past appointments')),
-                    const Center(child: Text('Cancelled appointments')),
+                    const Center(child: Text('')),
+                    const Center(child: Text('')),
                   ],
                 ),
               ),
@@ -80,18 +84,15 @@ class AppointmentCardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(10),
-      itemCount: appointments.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 6 / 2,
-      ),
-      itemBuilder: (context, index) {
-        return AppointmentCard(appointment: appointments[index]);
-      },
+    return ResponsiveGridList(
+      minItemsPerRow: 2,
+      maxItemsPerRow: 2,
+      horizontalGridSpacing: 10,
+      verticalGridSpacing: 10,
+      minItemWidth: 5 / 1.9,
+      children: appointments.map((appointment) {
+        return AppointmentCard(appointment: appointment);
+      }).toList(),
     );
   }
 }
@@ -108,9 +109,14 @@ class AppointmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final consultation = appointment.consultationId;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
+        onTap: () {
+          context.go(Routes.appointmentsDetails, extra: appointment);
+        },
         hoverColor: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: AnimatedContainer(
@@ -124,9 +130,10 @@ class AppointmentCard extends StatelessWidget {
               width: 0.5,
             ),
           ),
-          padding: const EdgeInsets.all(8), // Reduced padding
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -134,17 +141,17 @@ class AppointmentCard extends StatelessWidget {
                   SizedBox(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: appointment.info?.staff?.staffId != null
+                      child: consultation?.images?.isNotEmpty ?? false
                           ? Image.network(
-                              "https://example.com/${appointment.info?.staff?.staffId}.jpeg", // Placeholder for staff image URL
+                              consultation!.images!.first,
                               height: 76,
-                              width: 49,
+                              width: 59,
                               fit: BoxFit.cover,
                             )
-                          : Image.asset(
-                              "assets/images/ecom.jpeg", // Fallback image
-                              height: 76,
-                              width: 49,
+                          : const Icon(
+                              Icons.photo,
+                              color: Colors.black,
+                              size: 25,
                             ),
                     ),
                   ),
@@ -153,15 +160,9 @@ class AppointmentCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 18,
-                          width: 70,
-                          color: Colors.brown,
-                        ),
-                        const SizedBox(height: 4),
                         Text(
-                          appointment.info?.staff?.staffName ??
-                              'Consultation Name',
+                          consultation!.name ??
+                              'Unknown Consultation', // Name from consultationId
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -171,27 +172,27 @@ class AppointmentCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
-                        Text(
-                          appointment.info?.address ??
-                              'Consultation description goes here',
+                        HtmlText(
+                          text: consultation.description ?? 'No Description',
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             color: Colors.grey,
                           ),
                           maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          // overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
                         Row(
                           children: [
                             Text(
-                              'Starts from',
+                              'Starts from ',
                               style: GoogleFonts.inter(
                                   fontSize: 11, color: Colors.grey),
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              appointment.amount?.toString() ?? '0',
+                              appointment.amount?.toString() ??
+                                  '', // Amount from appointment
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -217,65 +218,85 @@ class AppointmentCard extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.all(8),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          appointment.slot ?? '',
-                          style: GoogleFonts.inter(
-                              fontSize: 11, color: Colors.black),
+                        Row(
+                          children: [
+                            Text(
+                              'Meeting Type:',
+                              style: GoogleFonts.inter(
+                                  fontSize: 11, color: Colors.black),
+                            ),
+                            Text(
+                              appointment.meetingType ??
+                                  '', // Slot from appointment
+                              style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          appointment.appointmentStatus ?? '',
+                          '${consultation.duration} min duration',
+                          // Status from appointment
                           style: GoogleFonts.inter(
-                              fontSize: 11, color: Colors.black),
+                              fontSize: 11,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              if (isShowButton) ...[
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          backgroundColor: Colors.brown,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 36.0),
-                        ),
-                        onPressed: () {
-                          // Placeholder button action
-                        },
-                        child: const Text('Book Now'),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Booking Date:',
+                        style: GoogleFonts.inter(
+                            fontSize: 11, color: Colors.black),
                       ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          minimumSize: const Size(double.infinity, 36.0),
-                          padding: EdgeInsets.zero,
-                          side: BorderSide(
-                              color: Colors.grey.shade600, width: 0.5),
-                          foregroundColor: Colors.grey.shade600,
-                        ),
-                        onPressed: () {},
-                        child: const Text('View Details'),
+                      Text(
+                        appointment.date ?? '',
+                        style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Slot:',
+                        style: GoogleFonts.inter(
+                            fontSize: 11, color: Colors.black),
+                      ),
+                      Text(
+                        appointment.slot ?? '',
+                        style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                appointment.appointmentStatus ?? '',
+                style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),

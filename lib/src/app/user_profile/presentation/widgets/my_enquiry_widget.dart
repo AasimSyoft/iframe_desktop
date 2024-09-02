@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iframe_desktop/src/app/routes/app_router.dart';
 import 'package:iframe_desktop/src/app/user_profile/providers/my_enquiry_provider.dart';
+import 'package:intl/intl.dart';
 
 class MyEnquiryWidget extends ConsumerWidget {
   const MyEnquiryWidget({super.key});
@@ -30,8 +33,15 @@ class MyEnquiryWidget extends ConsumerWidget {
               final enquiry = enquiryList[index];
               return EnquiryCard(
                 requirementTitle: enquiry.requirementTitle ?? 'N/A',
-                description: enquiry.description ?? 'N/A',
-                referredBy: enquiry.owner ?? 'N/A',
+                description: enquiry.enquiryId ?? 'N/A',
+                referredBy:
+                    DateFormat('MMMM d, yyyy').format(enquiry.createdAt!),
+                onTap: () {
+                  context.go(
+                    Routes.myEnquiryDetails,
+                    extra: enquiry,
+                  );
+                },
               );
             },
           );
@@ -49,11 +59,13 @@ class EnquiryCard extends StatelessWidget {
     required this.requirementTitle,
     required this.description,
     required this.referredBy,
+    required this.onTap,
   });
 
   final String requirementTitle;
   final String description;
   final String referredBy;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +89,15 @@ class EnquiryCard extends StatelessWidget {
           style:
               const TextStyle(fontWeight: FontWeight.bold, color: Colors.brown),
         ),
-        subtitle: Text(description),
+        subtitle: Text(
+          description,
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade500,
+              fontSize: 10),
+        ),
         trailing: Text(referredBy),
-        onTap: () {},
+        onTap: onTap, // Navigate on tap
       ),
     );
   }

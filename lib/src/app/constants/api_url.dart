@@ -12,4 +12,10 @@ class ApiUrl {
   static const String updateProfile = '/crm_service/Contacts';
   static const String appoitments = '/consultations/end_user/appointments/';
   static const String getClientProjects = '/client/projects/';
+  static const String getChats = '/chats/conversations';
+  static const String addToCart = '/product/cart/cart-items/update/';
+  static const String getCartItems = '/product/cart/cart-items/';
+  static const String getShippingAddress = '/users/profile/address/';
+  static const String uploadFile = '/common/end_user_files/';
+  static const String preSignedUrl = '/users/aws_utils/pre_signed_url/';
 }

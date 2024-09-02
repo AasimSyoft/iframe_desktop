@@ -1,8 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iframe_desktop/src/app/user_profile/data/models/appointments.dart';
+import 'package:iframe_desktop/src/app/user_profile/data/models/enquiry.dart';
+import 'package:iframe_desktop/src/app/user_profile/data/models/meetings.dart';
+import 'package:iframe_desktop/src/app/user_profile/data/models/order.dart';
 import 'package:iframe_desktop/src/app/user_profile/presentation/user_wrapper.dart';
+import 'package:iframe_desktop/src/app/user_profile/presentation/widgets/my_appointments_details_view.dart';
+import 'package:iframe_desktop/src/app/user_profile/presentation/widgets/my_enquiry_details_view.dart';
 import 'package:iframe_desktop/src/app/user_profile/presentation/widgets/my_meetings_details_view.dart';
+import 'package:iframe_desktop/src/app/user_profile/presentation/widgets/my_order_details_view%20.dart';
 import 'package:iframe_desktop/src/features/cart/presentation/cart_view.dart';
 import 'package:iframe_desktop/src/features/login/presentation/login_view.dart';
 import 'package:iframe_desktop/src/features/login/presentation/verify_otp_view.dart';
@@ -11,9 +18,9 @@ import '../../features/cart/presentation/cart_wrapper.dart';
 import '../../features/cart/presentation/success_view .dart';
 import '../../features/checkout/presentation/checkout_view.dart';
 import '../user_profile/presentation/user_view.dart';
-import '../user_profile/presentation/widgets/appointment_widget.dart';
 import '../user_profile/presentation/widgets/edit_profile.dart';
 import '../user_profile/presentation/widgets/manage_address_widget.dart';
+import '../user_profile/presentation/widgets/my_appointment_widget.dart';
 import '../user_profile/presentation/widgets/my_enquiry_widget.dart';
 import '../user_profile/presentation/widgets/my_files_widget.dart';
 import '../user_profile/presentation/widgets/my_meetings_widget.dart';
@@ -26,9 +33,11 @@ part 'app_routes.dart';
 class AppRouter {
   AppRouter._();
 
-  /// The main router for the application, using GoRouter for navigation.
+  /// The main router for the application, using GoRoutejr for navigation.
   static final router = GoRouter(
-    initialLocation: _Path.login,
+    initialLocation: '/editProfile',
+    //  _Path.login,
+    //  _Path.cart,
     //  '/editProfile',
     //  _Path.userView,
     redirect: _handleRedirect,
@@ -36,12 +45,6 @@ class AppRouter {
         MaterialPage(child: PageNotFound(state.uri.toString())),
 
     routes: [
-      AppRoute(_Path.login, (_) => LoginView(), routes: [
-        AppRoute(
-          _Path.verifyOtp,
-          (state) => const VerifyOtpView(),
-        )
-      ]),
       ShellRoute(
         builder: (_, __, navigator) => CartWrapper(
           child: navigator,
@@ -67,6 +70,12 @@ class AppRouter {
           ),
         ],
       ),
+      AppRoute(_Path.login, (_) => LoginView(), routes: [
+        AppRoute(
+          _Path.verifyOtp,
+          (state) => const VerifyOtpView(),
+        )
+      ]),
       StatefulShellRoute.indexedStack(
         builder: (_, __, navigator) => UserWrapper(
           child: navigator,
@@ -85,20 +94,34 @@ class AppRouter {
                     (_) => EditProfileView(),
                   ),
                   AppRoute(
-                    useFade: true,
-                    _Path.appoitments,
-                    (_) => const AppointmentWidget(),
-                  ),
+                      useFade: true,
+                      _Path.appointments,
+                      (_) => const AppointmentWidget(),
+                      routes: [
+                        AppRoute(
+                          _Path.appointmentsDetails,
+                          useFade: true,
+                          (state) => MyAppointmentDetailView(
+                              appointment: state.extra as Appointment),
+                        ),
+                      ]),
                   AppRoute(
                     useFade: true,
                     _Path.myFiles,
                     (_) => const MyFilesWidget(),
                   ),
                   AppRoute(
-                    useFade: true,
-                    _Path.myEnquiry,
-                    (_) => const MyEnquiryWidget(),
-                  ),
+                      useFade: true,
+                      _Path.myEnquiry,
+                      (_) => const MyEnquiryWidget(),
+                      routes: [
+                        AppRoute(
+                          useFade: true,
+                          _Path.myEnquiryDetails,
+                          (state) => MyEnquiryDetailView(
+                              enquiry: state.extra as Enquiry),
+                        ),
+                      ]),
                   AppRoute(
                     useFade: true,
                     _Path.services,
@@ -112,13 +135,22 @@ class AppRouter {
                         AppRoute(
                             _Path.meetingDetails,
                             useFade: true,
-                            (_) => const MyMeetingDetailsView())
+                            (state) => MyMeetingDetailsView(
+                                  meeting: state.extra as Meeting,
+                                ))
                       ]),
                   AppRoute(
-                    useFade: true,
-                    _Path.orders,
-                    (_) => const MyOrdersWidgetView(),
-                  ),
+                      useFade: true,
+                      _Path.orders,
+                      (_) => const MyOrdersWidgetView(),
+                      routes: [
+                        AppRoute(
+                            _Path.orderDetails,
+                            useFade: true,
+                            (state) => MyOrderDetailsView(
+                                  order: state.extra as Order,
+                                ))
+                      ]),
                   AppRoute(
                     useFade: true,
                     _Path.manageAddress,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iframe_desktop/src/app/routes/app_router.dart';
 import 'package:iframe_desktop/src/app/user_profile/data/models/order.dart';
 import 'package:iframe_desktop/src/app/user_profile/providers/my_orders_provider.dart';
 
@@ -70,7 +72,9 @@ class OrderCard extends StatelessWidget {
         ),
         duration: const Duration(milliseconds: 300),
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            context.go(Routes.orderDetails, extra: order);
+          },
           child: Row(
             children: [
               ClipRRect(

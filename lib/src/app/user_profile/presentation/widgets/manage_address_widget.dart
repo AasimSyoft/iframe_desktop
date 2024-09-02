@@ -91,21 +91,21 @@ class ManageAddressWidgetView extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.brown),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      minimumSize: const Size.fromHeight(45),
-                    ),
-                    onPressed: () {
-                      // Handle navigation to AddNewAddress
-                    },
-                    child: const Text(
-                      'Add new address',
-                      style: TextStyle(color: Colors.brown),
-                    ),
-                  ),
+                  // OutlinedButton(
+                  //   style: OutlinedButton.styleFrom(
+                  //     side: const BorderSide(color: Colors.brown),
+                  //     shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(10)),
+                  //     minimumSize: const Size.fromHeight(45),
+                  //   ),
+                  //   onPressed: () {
+                  //     // Handle navigation to AddNewAddress
+                  //   },
+                  //   child: const Text(
+                  //     'Add new address',
+                  //     style: TextStyle(color: Colors.brown),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

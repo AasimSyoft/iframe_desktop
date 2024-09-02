@@ -57,6 +57,8 @@ dependencies:
   talker_dio_logger: ^4.4.1
   talker_flutter: ^4.4.1
   dotted_line: ^3.2.2
+  file_picker: ^8.1.2
+  heroicons: ^0.10.0
 
 
 dev_dependencies:

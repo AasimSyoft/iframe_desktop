@@ -13,12 +13,17 @@ class _Path {
   static const String success = 'success';
   static const String userView = '/';
   static const String editProfile = 'editProfile';
-  static const String appoitments = 'appoitments';
+  static const String appointments = 'appointments';
+  static const String appointmentsDetails = 'appointmentsDetails';
+
   static const String myFiles = 'myFiles';
   static const String myEnquiry = 'myEnquiry';
+  static const String myEnquiryDetails = 'myEnquiryDetails';
+
   static const String services = 'services';
   static const String meetings = 'meetings';
   static const String meetingDetails = 'meetingDetails';
+  static const String orderDetails = 'orderDetails';
 
   static const String orders = 'orders';
   static const String manageAddress = 'manageAddress';
@@ -37,13 +42,19 @@ class Routes {
   static String success = '/checkout/success';
   static String userView = _Path.userView;
   static String editProfile = '/editProfile';
-  static String appoitments = '/appoitments';
+  static String appointments = '/appointments';
+  static String appointmentsDetails = '/appointments/appointmentsDetails';
+
   static String myFiles = '/myFiles';
   static String myEnquiry = '/myEnquiry';
+  static String myEnquiryDetails = '/myEnquiry/myEnquiryDetails';
+
   static String services = '/services';
   static String meetings = '/meetings';
   static String meetingDetails = '/meetings/meetingDetails';
 
   static String orders = '/orders';
+  static String orderDetails = '/orders/orderDetails';
+
   static String manageAddress = '/manageAddress';
 }

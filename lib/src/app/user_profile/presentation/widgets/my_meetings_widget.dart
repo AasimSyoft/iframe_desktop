@@ -32,6 +32,7 @@ class MyMeetingView extends ConsumerWidget {
       ),
       body: meetingsAsyncValue.when(
         data: (meetings) {
+          // Check if data is available
           if (meetings.data == null || meetings.data!.isEmpty) {
             return const Center(child: Text('No meetings available'));
           }
@@ -46,12 +47,7 @@ class MyMeetingView extends ConsumerWidget {
             },
             itemBuilder: (BuildContext context, int index) {
               final meeting = meetings.data![index];
-              return MyMeetingCard(
-                staffName: meeting.staffName,
-                bookingName: meeting.bookingName,
-                date: meeting.date,
-                meetingId: meeting.id, // Pass the meetingId
-              );
+              return MyMeetingCard(meeting: meeting);
             },
           );
         },
@@ -63,17 +59,11 @@ class MyMeetingView extends ConsumerWidget {
 }
 
 class MyMeetingCard extends StatelessWidget {
-  final String? staffName;
-  final String? bookingName;
-  final DateTime? date;
-  final String? meetingId; // Add the meetingId
+  final Meeting meeting;
 
   const MyMeetingCard({
     super.key,
-    this.staffName,
-    this.bookingName,
-    this.date,
-    this.meetingId, // Initialize meetingId
+    required this.meeting,
   });
 
   @override
@@ -86,14 +76,14 @@ class MyMeetingCard extends StatelessWidget {
           radius: 20,
           backgroundColor: Colors.grey.shade200,
           child: Text(
-            staffName?.substring(0, 2).toUpperCase() ?? '',
+            meeting.staffName?.substring(0, 2).toUpperCase() ?? '',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
         title: Text(
-          bookingName ?? '',
+          meeting.bookingName ?? '',
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
             overflow: TextOverflow.ellipsis,
@@ -104,7 +94,7 @@ class MyMeetingCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              staffName ?? '',
+              meeting.staffName ?? '',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.grey.shade600,
                 overflow: TextOverflow.ellipsis,
@@ -123,7 +113,7 @@ class MyMeetingCard extends StatelessWidget {
                 vertical: 5,
               ),
               child: Text(
-                '• ${DateFormat('EEE, dd MMM ').format(date ?? DateTime.now())}',
+                '• ${DateFormat('EEE, dd MMM ').format(meeting.date ?? DateTime.now())}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: const Color(0xff73321B),
                 ),
@@ -134,8 +124,7 @@ class MyMeetingCard extends StatelessWidget {
         trailing: const Icon(Icons.chevron_right),
         visualDensity: VisualDensity.compact,
         onTap: () {
-          context.goNamed(Routes.meetingDetails,
-              extra: meetingId); // Pass the meetingId
+          context.go(Routes.meetingDetails, extra: meeting);
         },
       ),
     );
